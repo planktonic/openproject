@@ -13,16 +13,19 @@
 
 version: 0.8.5
 
-# files:
-#   # Additional patterns beyond the defaults (**.html, **.rhtml, **.html.erb, etc.)
-#   include:
-#     - '**/*.xml.erb'
-#     - 'custom/**/*.html'
-#
-#   # Patterns to exclude (can exclude defaults too)
-#   exclude:
-#     - 'public/**/*'
-#     - 'tmp/**/*'
+files:
+  # Additional patterns beyond the defaults (**.html, **.rhtml, **.html.erb, etc.)
+  # include:
+  #   - '**/*.xml.erb'
+  #   - 'custom/**/*.html'
+
+  # Patterns to exclude (can exclude defaults too)
+  exclude:
+    - 'coverage/**/*'
+    - 'frontend/**/*'
+    - 'modules/*/frontend/**/*'
+    - 'public/**/*'
+    - 'tmp/**/*'
 
 linter:
   enabled: true
@@ -35,7 +38,11 @@ linter:
   # exclude:
   #   - 'app/views/admin/**/*'
 
-  # rules:
+  rules:
+    # The canonical copyright header opens with `<%#--` and closes with `++#%>`.
+    erb-require-whitespace-inside-tags:
+      enabled: false
+
   #   erb-no-extra-newline:
   #     enabled: false
   #
