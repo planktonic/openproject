@@ -26,7 +26,6 @@
 #
 # See COPYRIGHT and LICENSE files for more details.
 #++
-#
 
 module Documents
   module ShowEditView

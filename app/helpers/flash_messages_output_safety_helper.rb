@@ -26,7 +26,6 @@
 #
 # See COPYRIGHT and LICENSE files for more details.
 #++
-#
 
 module FlashMessagesOutputSafetyHelper
   extend ActiveSupport::Concern

@@ -26,7 +26,6 @@
 #
 # See COPYRIGHT and LICENSE files for more details.
 #++
-#
 
 class MeetingAgendaItem < ApplicationRecord
   ITEM_TYPES = {
