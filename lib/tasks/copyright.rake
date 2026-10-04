@@ -155,7 +155,7 @@ namespace :copyright do
     when :css, :sass
       /\A(?<shebang>#![^\n]+\n)?(?<additional>.*)?\/\/\s*--\s*copyright.*?\/\/\s*\+\+/m
     when :erb
-      /\A(?<shebang>#![^\n]+\n)?(?<additional>.*)?<%#--\s*copyright.*?\+\+#%>/m
+      /\A(?<shebang>#![^\n]+\n)?(?<additional>.*)?<%#\s*--\s*copyright.*?\+\+\s*#?\s*%>/m
     when :rdoc
       /(?<shebang>)?(?<additional>.*)?-{10}\n={4} copyright\n\n[\s\S]*?\+\+\n-{10}\n\z/
     when :md, :html

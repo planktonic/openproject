@@ -439,6 +439,66 @@ RSpec.describe Rake::Task, :copyright do
     end
   end
 
+  describe "copyright:update_html_erb" do
+    let(:task_name) { "copyright:update_html_erb" }
+
+    let(:canonical_header) do
+      <<~HEADER.chomp
+        <%#-- copyright
+        OpenProject copyright.
+
+        Released under the GPL.
+        ++#%>
+      HEADER
+    end
+
+    let(:source) { "<p>Source</p>\n" }
+
+    it "normalizes spaced and reformatted markers" do
+      write_source("spaced.html.erb", <<~ERB)
+        <%# -- copyright
+        Old copyright.
+
+        ++# %>
+
+        #{source.chomp}
+      ERB
+      write_source("reformatted.html.erb", <<~ERB)
+        <%#
+          -- copyright
+          Old copyright.
+
+          ++#
+        %>
+
+        #{source.chomp}
+      ERB
+      write_source("unhashed.html.erb", <<~ERB)
+        <%#-- copyright
+        Old copyright.
+
+        ++%>
+
+        #{source.chomp}
+      ERB
+
+      subject.invoke(".")
+
+      expect_canonical_header("spaced.html.erb", source)
+      expect_canonical_header("reformatted.html.erb", source)
+      expect_canonical_header("unhashed.html.erb", source)
+    end
+
+    it "leaves an existing canonical header unchanged" do
+      content = "#{canonical_header}\n\n#{source}"
+      write_source("canonical.html.erb", content)
+
+      subject.invoke(".")
+
+      expect(File.read("canonical.html.erb")).to eq(content)
+    end
+  end
+
   describe "copyright:update_sass" do
     let(:task_name) { "copyright:update_sass" }
 
