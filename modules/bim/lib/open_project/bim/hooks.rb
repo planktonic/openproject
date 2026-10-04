@@ -24,7 +24,6 @@
 #
 # See COPYRIGHT and LICENSE files for more details.
 #++
-# +
 
 module OpenProject::Bim::Hooks
   class Hook < OpenProject::Hook::Listener

@@ -24,7 +24,7 @@
 #
 # See COPYRIGHT and LICENSE files for more details.
 #++
-# +
+
 require "open3"
 
 module Bim
