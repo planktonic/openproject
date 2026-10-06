@@ -30,17 +30,13 @@ import { Controller } from '@hotwired/stimulus';
 import { retrieveCkEditorInstance } from 'core-app/shared/helpers/ckeditor-helpers';
 
 interface QuoteResult {
-  subject:string;
   content:string;
 }
 
 export default class ForumMessagesController extends Controller {
   static targets = [
     'reply',
-    'subject',
   ];
-
-  declare readonly subjectTarget:HTMLInputElement;
 
   declare readonly replyTarget:HTMLElement;
 
@@ -57,9 +53,7 @@ export default class ForumMessagesController extends Controller {
       .then((result:QuoteResult) => this.insertQuoteInReply(result));
   }
 
-  private insertQuoteInReply({ subject, content }:QuoteResult):void {
-    this.subjectTarget.value = subject;
-
+  private insertQuoteInReply({ content }:QuoteResult):void {
     const editor = retrieveCkEditorInstance(this.replyTarget);
     editor?.setData(content);
 
