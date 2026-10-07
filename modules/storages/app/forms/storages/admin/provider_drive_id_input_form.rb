@@ -38,7 +38,7 @@ module Storages::Admin
         required: true,
         caption: helpers.link_translate(
           "storages.instructions.onedrive.drive_id_html",
-          links: { drive_id_guide: %i[storage_docs one_drive_drive_id_guide] }
+          links: { drive_id_guide: %i[storage_docs onedrive_drive_id_guide] }
         ),
         input_width: :large
       )

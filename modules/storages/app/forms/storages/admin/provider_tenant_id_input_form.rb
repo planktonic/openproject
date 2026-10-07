@@ -38,7 +38,7 @@ module Storages::Admin
         required: true,
         caption: helpers.link_translate(
           "storages.instructions.onedrive.tenant_id_html",
-          links: { application_link: %i[storage_docs one_drive_oauth_application] }
+          links: { application_link: %i[storage_docs onedrive_oauth_application] }
         ),
         placeholder: I18n.t("storages.instructions.onedrive.tenant_id_placeholder"),
         input_width: :large
