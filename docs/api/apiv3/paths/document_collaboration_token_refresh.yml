@@ -1,0 +1,139 @@
+# /api/v3/documents/{id}/collaboration_token/refresh
+---
+post:
+  parameters:
+  - description: Document id
+    example: 1
+    in: path
+    name: id
+    required: true
+    schema:
+      type: integer
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - token
+          properties:
+            token:
+              type: string
+              description: The previously issued collaboration token. It may already be expired.
+        examples:
+          request:
+            value:
+              token: "Q2lwaGVydGV4dA==--SXZJdlZJdg==--QXV0aFRhZw=="
+  responses:
+    '201':
+      content:
+        application/hal+json:
+          examples:
+            response:
+              value:
+                _type: CollaborationToken
+                token: "Q2lwaGVydGV4dA==--SXZJdlZJdg==--QXV0aFRhZw=="
+                documentName: "https://openproject.example.com/api/v3/documents/1"
+                expiresAt: '2025-01-04T09:05:00Z'
+                expiresInSeconds: 300
+                _links:
+                  document:
+                    href: "/api/v3/documents/1"
+                    title: Some document
+                  refresh:
+                    href: "/api/v3/documents/1/collaboration_token/refresh"
+                    method: post
+                  collaborationServer:
+                    href: "wss://hocuspocus.example.com"
+          schema:
+            "$ref": "../components/schemas/collaboration_token_model.yml"
+      description: "Created. The response must not be cached (`Cache-Control: no-store`)."
+      headers: {}
+    '400':
+      content:
+        application/hal+json:
+          schema:
+            $ref: "../components/schemas/error_response.yml"
+          examples:
+            response:
+              value:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:BadRequest
+                message: 'Bad request: token is missing'
+      description: Returned if the request body does not contain a token.
+      headers: {}
+    '403':
+      content:
+        application/hal+json:
+          schema:
+            $ref: "../components/schemas/error_response.yml"
+          examples:
+            response:
+              value:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
+                message: Requests authenticated with a collaboration token cannot request collaboration tokens.
+      description: |-
+        Returned if the request is authenticated with a token that was issued to the collaboration server.
+        Such tokens can not request further tokens.
+      headers: {}
+    '404':
+      content:
+        application/hal+json:
+          schema:
+            $ref: "../components/schemas/error_response.yml"
+          examples:
+            response:
+              value:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
+                message: The requested resource could not be found.
+      description: |-
+        Returned if the document does not exist or if the user does not have permission to view it.
+
+        **Required permission** `view documents` in the project the document belongs to
+      headers: {}
+    '422':
+      content:
+        application/hal+json:
+          schema:
+            $ref: "../components/schemas/error_response.yml"
+          examples:
+            not_collaborative:
+              value:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:UnprocessableContent
+                message: The document does not support real-time collaboration.
+            collaboration_disabled:
+              value:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:UnprocessableContent
+                message: Real-time collaboration is not enabled.
+            server_not_configured:
+              value:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:UnprocessableContent
+                message: The real-time collaboration server is not configured.
+            invalid_previous_token:
+              value:
+                _type: Error
+                errorIdentifier: urn:openproject-org:api:v3:errors:UnprocessableContent
+                message: The previous collaboration token is invalid or does not belong to this document and user.
+      description: |-
+        Returned if the document is not collaborative, if real-time collaboration is disabled, if the
+        collaboration server is not configured, or if the previous token is invalid, was issued for another
+        document or belongs to another user. Nothing is revoked in that case.
+      headers: {}
+  tags:
+  - Documents
+  description: |-
+    Exchanges a previously issued collaboration token for a new one.
+
+    The request is authorized by the client's own credentials, exactly like creating a token.
+    The previous token only identifies which token to revoke, so an expired previous token is accepted.
+    This allows clients to recover after sleep or offline periods.
+
+    The previous token is revoked after a grace period of 30 seconds. Clients should hand the new token
+    to the collaboration server right away, e.g. by calling `sendToken()` on the Hocuspocus provider.
+  operationId: Refresh_document_collaboration_token
+  summary: Refresh collaboration token

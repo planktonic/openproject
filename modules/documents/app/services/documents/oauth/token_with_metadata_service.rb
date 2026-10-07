@@ -79,14 +79,14 @@ module Documents
         )
       end
 
-      private
-
       def resource_url
         @resource_url ||= URI.join(
           OpenProject::StaticRouting::StaticUrlHelpers.new.root_url,
           api_v3_paths.document(document.id)
         ).to_s
       end
+
+      private
 
       def readonly
         @readonly ||= user.allowed_in_project?(:view_documents, project) &&

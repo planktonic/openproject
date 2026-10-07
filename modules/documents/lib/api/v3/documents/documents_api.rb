@@ -84,6 +84,109 @@ module API
               end
             end
 
+            namespace :collaboration_token do
+              helpers do
+                def collaboration_document
+                  @collaboration_document ||= document
+                end
+
+                def authorize_collaboration_token_request
+                  authorize_in_project(:view_documents, project: collaboration_document.project)
+
+                  if collaboration_token_request?
+                    raise ::API::Errors::Unauthorized.new(
+                      message: I18n.t("documents.collaboration_token.errors.collaboration_token_not_allowed")
+                    )
+                  end
+
+                  ensure_collaboration_available
+                end
+
+                # Requests authenticated with a token issued to the collaboration server must not be able
+                # to obtain further tokens. Otherwise collaboration would outlive the user's own credential.
+                def collaboration_token_request?
+                  access_token = ::Doorkeeper::OAuth::Token.authenticate(
+                    ::Doorkeeper::Grape::AuthorizationDecorator.new(request),
+                    *Doorkeeper.configuration.access_token_methods
+                  )
+
+                  ::Documents::OAuth::EnsureApplicationService.collaboration_token?(access_token)
+                end
+
+                def ensure_collaboration_available
+                  error_key = collaboration_unavailable_reason
+                  return if error_key.nil?
+
+                  raise ::API::Errors::UnprocessableContent.new(
+                    I18n.t("documents.collaboration_token.errors.#{error_key}")
+                  )
+                end
+
+                def collaboration_unavailable_reason
+                  if !collaboration_document.collaborative?
+                    :not_collaborative
+                  elsif !Setting.real_time_text_collaboration_enabled?
+                    :collaboration_disabled
+                  elsif Setting.collaborative_editing_hocuspocus_url.blank? ||
+                        Setting.collaborative_editing_hocuspocus_secret.blank?
+                    :server_not_configured
+                  end
+                end
+
+                def collaboration_token_response(token_result)
+                  header "Cache-Control", "no-store"
+                  status 201
+
+                  CollaborationTokenRepresenter.new(
+                    CollaborationTokenRepresenter::CollaborationToken.from_token_result(collaboration_document,
+                                                                                        token_result),
+                    current_user:
+                  )
+                end
+
+                def fail_token_creation
+                  raise ::API::Errors::SafeInternalError.new(I18n.t("api_v3.errors.code_500"))
+                end
+              end
+
+              after_validation do
+                authorize_collaboration_token_request
+              end
+
+              post do
+                result = ::Documents::OAuth::TokenWithMetadataService
+                  .new(user: current_user, document: collaboration_document, project: collaboration_document.project)
+                  .call
+
+                fail_token_creation if result.failure?
+
+                collaboration_token_response(result.result)
+              end
+
+              namespace :refresh do
+                params do
+                  requires :token, type: String, desc: "The previously issued collaboration token"
+                end
+
+                post do
+                  result = ::Documents::OAuth::RefreshTokenService
+                    .new(user: current_user,
+                         document: collaboration_document,
+                         project: collaboration_document.project,
+                         previous_token: declared_params[:token])
+                    .call
+
+                  if result.success?
+                    collaboration_token_response(result.result)
+                  elsif result.includes_error?(:token, :invalid)
+                    raise ::API::Errors::UnprocessableContent.new(result.message)
+                  else
+                    fail_token_creation
+                  end
+                end
+              end
+            end
+
             mount ::API::V3::Attachments::AttachmentsByDocumentAPI
           end
         end
