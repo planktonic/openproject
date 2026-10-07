@@ -136,6 +136,14 @@ module OpenProject::Documents
       mount ::API::V3::Documents::DocumentsAPI
     end
 
+    config.to_prepare do
+      Doorkeeper.configuration.scopes.add(Documents::OAuth::COLLABORATION_SCOPE)
+
+      OpenProject::Authentication.add_internal_oauth_scope(Documents::OAuth::COLLABORATION_SCOPE)
+      OpenProject::Authentication.add_restricted_oauth_scope(OpenProject::Authentication::Scope::API_V3,
+                                                             Documents::OAuth::COLLABORATION_SCOPE)
+    end
+
     # Add documents to allowed search params
     additional_permitted_attributes search: %i(documents)
   end

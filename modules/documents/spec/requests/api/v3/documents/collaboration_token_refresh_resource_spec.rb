@@ -170,7 +170,7 @@ RSpec.describe "API v3 document collaboration token refresh resource" do
         it_behaves_like "rejects the previous token"
       end
 
-      context "with a token whose OAuth token belongs to another OAuth application" do
+      context "with a token whose OAuth token lacks the collaboration scope" do
         let(:previous_token) do
           payload = {
             resource_url: "http://#{Setting.host_name}#{api_v3_paths.document(document.id)}",

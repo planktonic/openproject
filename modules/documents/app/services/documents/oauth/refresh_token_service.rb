@@ -86,7 +86,7 @@ module Documents
         return if payload["resource_url"] != token_with_metadata_service.resource_url
 
         access_token = ::Doorkeeper::AccessToken.by_token(payload["oauth_token"])
-        return unless EnsureApplicationService.collaboration_token?(access_token)
+        return unless access_token&.includes_scope?(COLLABORATION_SCOPE)
         return if access_token.resource_owner_id != user.id
 
         access_token

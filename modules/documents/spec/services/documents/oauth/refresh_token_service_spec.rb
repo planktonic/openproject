@@ -177,7 +177,7 @@ RSpec.describe Documents::OAuth::RefreshTokenService,
       it_behaves_like "rejects the previous token"
     end
 
-    context "with a token whose OAuth token belongs to another OAuth application" do
+    context "with a token whose OAuth token lacks the collaboration scope" do
       let(:foreign_access_token) { create(:oauth_access_token, resource_owner: user) }
       let(:previous_token) do
         encrypt(resource_url: previous_token_result[:resource_url],

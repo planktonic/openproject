@@ -61,12 +61,14 @@ module API
               end
             end
 
+            route_setting :oauth_scopes, [::Documents::OAuth::COLLABORATION_SCOPE]
             get do
               ::API::V3::Documents::DocumentRepresenter.new(document,
                                                             current_user:,
                                                             embed_links: true)
             end
 
+            route_setting :oauth_scopes, [::Documents::OAuth::COLLABORATION_SCOPE]
             patch do
               doc = document
               request_body = JSON.parse(request.body.read)
@@ -92,25 +94,7 @@ module API
 
                 def authorize_collaboration_token_request
                   authorize_in_project(:view_documents, project: collaboration_document.project)
-
-                  if collaboration_token_request?
-                    raise ::API::Errors::Unauthorized.new(
-                      message: I18n.t("documents.collaboration_token.errors.collaboration_token_not_allowed")
-                    )
-                  end
-
                   ensure_collaboration_available
-                end
-
-                # Requests authenticated with a token issued to the collaboration server must not be able
-                # to obtain further tokens. Otherwise collaboration would outlive the user's own credential.
-                def collaboration_token_request?
-                  access_token = ::Doorkeeper::OAuth::Token.authenticate(
-                    ::Doorkeeper::Grape::AuthorizationDecorator.new(request),
-                    *Doorkeeper.configuration.access_token_methods
-                  )
-
-                  ::Documents::OAuth::EnsureApplicationService.collaboration_token?(access_token)
                 end
 
                 def ensure_collaboration_available

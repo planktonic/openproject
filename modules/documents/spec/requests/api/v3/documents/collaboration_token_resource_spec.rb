@@ -75,7 +75,8 @@ RSpec.describe "API v3 document collaboration token resource" do
         access_token = Doorkeeper::AccessToken.by_token(payload["oauth_token"])
         expect(access_token.resource_owner_id).to eq(current_user.id)
         expect(access_token.expires_in).to eq(5.minutes.to_i)
-        expect(Documents::OAuth::EnsureApplicationService.collaboration_token?(access_token)).to be(true)
+        expect(access_token.application.uid).to eq(Documents::OAuth::EnsureApplicationService::APPLICATION_UID)
+        expect(access_token.scopes.to_a).to eq([Documents::OAuth::COLLABORATION_SCOPE])
       end
 
       it "does not expose the plain OAuth token" do
