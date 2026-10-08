@@ -63,7 +63,7 @@ module Statuses
       end
     end
 
-    def closed = flag_checkmark(:closed, status.is_closed?)
+    def closed = flag_checkmark(:closed, status.closed?)
 
     def readonly = flag_checkmark(:readonly, status.is_readonly?)
 

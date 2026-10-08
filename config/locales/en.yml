@@ -399,11 +399,15 @@ en:
       scim_client:
         authentication_method: "Authentication method"
         jwt_sub: "Subject claim"
+      status/category:
+        open: "Open"
+        in_progress: "In Progress"
+        closed: "Closed"
       status:
         default_done_ratio: "% Complete"
         excluded_from_totals: "Exclude from calculation of totals in hierarchy"
-        is_closed: "Work package closed"
         is_readonly: "Work package read-only"
+        category: "Category"
       subproject_template_assignment:
         workspace_type: "Workspace type"
       time_entry:
@@ -6882,6 +6886,11 @@ en:
 
   statuses:
     edit:
+      captions:
+        category:
+          open: "Work that has not yet started."
+          in_progress: "Work that is actively being worked on."
+          closed: "Work that has been completed."
       status_color_text: |
         Click to assign or change the color of this status.
         It is shown in the status button and can be used for highlighting work packages in the table.
