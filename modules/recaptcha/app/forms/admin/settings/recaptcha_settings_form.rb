@@ -82,7 +82,7 @@ module Admin
       private
 
       def available_caption_types
-        OpenProject::Recaptcha::Services::AVAILABLE.map { [I18n.t("recaptcha.settings.type_#{it.id}"), it.value, { trailing_image: it.icon }] }
+        OpenProject::Recaptcha::Services::AVAILABLE.map { [I18n.t("recaptcha.settings.type_#{it.id}"), it.value, { trailing_image: it.logo }] }
       end
 
       def recaptcha_settings

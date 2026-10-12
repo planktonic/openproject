@@ -31,34 +31,34 @@
 module OpenProject
   module Recaptcha
     module Services
-      Service = Data.define(:id, :api_version, :icon) do
+      Service = Data.define(:id, :api_version, :logo) do
         def value = id.to_s
       end
 
       DISABLED = Service.new(
         id: :disabled,
         api_version: 0,
-        icon: nil
+        logo: nil
       )
       V2 = Service.new(
         id: :v2,
         api_version: 2,
-        icon: "recaptcha/type-recaptcha.svg"
+        logo: "recaptcha/type-recaptcha.svg"
       )
       V3 = Service.new(
         id: :v3,
         api_version: 3,
-        icon: "recaptcha/type-recaptcha.svg"
+        logo: "recaptcha/type-recaptcha.svg"
       )
       HCAPTCHA = Service.new(
         id: :hcaptcha,
         api_version: 2,
-        icon: "recaptcha/type-hcaptcha.svg"
+        logo: "recaptcha/type-hcaptcha.svg"
       )
       TURNSTILE = Service.new(
         id: :turnstile,
         api_version: 99, # Turnstile is not comparable/compatible with recaptcha
-        icon: "recaptcha/type-turnstile.svg"
+        logo: "recaptcha/type-turnstile.svg"
       )
 
       VALID = [V2, V3, HCAPTCHA, TURNSTILE].freeze
